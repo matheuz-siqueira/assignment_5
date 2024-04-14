@@ -1,3 +1,4 @@
 class Template < ApplicationRecord
-    # has_many :emails
+    validates :name, presence: true 
+    validates :body, presence: true 
 end

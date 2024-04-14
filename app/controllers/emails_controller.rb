@@ -21,10 +21,9 @@ class EmailsController < ApplicationController
     @email = Email.new(email_params)
   
     @template = Template.find_by_id(template_params[:template])
-    # binding.pry
 
     if @template.present?  
-      # binding.pry
+
       @email.body = @template.body.gsub("{{-placeholder-}}", @email.body)
     end
 
@@ -46,7 +45,4 @@ class EmailsController < ApplicationController
       params.require(:email).permit! 
     end
     
-    # def find_template 
-    #   @template = Template.find_by_id(email_params[:template])
-    # end
 end
