@@ -1,32 +1,52 @@
 class EmailsController < ApplicationController
+
   def index
     @emails = Email.all
-  end
-
-  def new
-    @email = Email.new
   end
 
   def show
     @email = Email.find(params[:id])
   end
+  
+  def new
+    
+    # binding.pry
+    @email = Email.new
+    @templates = Template.all
+  end
 
   def create
+    
+    template_params = email_params.extract!("template")
     @email = Email.new(email_params)
+  
+    @template = Template.find_by_id(template_params[:template])
+    # binding.pry
+
+    if @template.present?  
+      # binding.pry
+      @email.body = @template.body.gsub("{{-placeholder-}}", @email.body)
+    end
+
 
     if @email.save
       Subscriber.all.each do |subscriber|
         NewsletterMailer.email(subscriber, @email).deliver_now
       end
-      redirect_to emails_path, notice: "Email sent"
+      flash[:notice] = "Email sent"
+      redirect_to emails_path
     else
       render :new, status: :unprocessable_entity
     end
   end
 
   private
-
+    
     def email_params
-      params.require(:email).permit(:subject, :body)
+      params.require(:email).permit! 
     end
+    
+    # def find_template 
+    #   @template = Template.find_by_id(email_params[:template])
+    # end
 end
